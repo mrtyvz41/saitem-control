@@ -22,11 +22,11 @@ int main(void)
 //if(start_flag){
 
 
-        buttonSpeedUp        = GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_SPEEDUP);
-        buttonRight          = GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_RIGHT);
+        buttonSpeedUp        = GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_SPEEDUP);
+        buttonRight          = GPIOPinRead(GPIO_PORTA_BASE, GPIO_PIN_RIGHT);
         buttonBrake          = GPIOPinRead(GPIO_PORTA_BASE, GPIO_PIN_BRAKE);
         buttonLeft           = GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_LEFT);
-        buttonSpeedDown      = GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_SPEEDDOWN);
+        buttonSpeedDown      = GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_SPEEDDOWN);
         button_on_off        = GPIOPinRead(GPIO_PORTA_BASE, GPIO_PIN_ONOFF);
 
 

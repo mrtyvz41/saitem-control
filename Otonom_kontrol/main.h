@@ -32,15 +32,15 @@
 
 #define GPIO_PIN_LEFT           GPIO_PIN_7
 
-#define GPIO_PIN_RIGHT          GPIO_PIN_2
+#define GPIO_PIN_RIGHT          GPIO_PIN_4
 
 #define GPIO_PIN_BRAKE          GPIO_PIN_3
 
-#define GPIO_PIN_SPEEDUP        GPIO_PIN_4  //GPIO_PIN_6
+#define GPIO_PIN_SPEEDUP        GPIO_PIN_6  //GPIO_PIN_6
 
-#define GPIO_PIN_SPEEDDOWN      GPIO_PIN_0 //GPIO_PIN_3
+#define GPIO_PIN_SPEEDDOWN      GPIO_PIN_3 //GPIO_PIN_3
 
-#define GPIO_PIN_ONOFF          GPIO_PIN_3
+#define GPIO_PIN_ONOFF          GPIO_PIN_2
 
 //PWM CONFIGS //
 
