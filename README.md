@@ -1,2 +1,2 @@
 # saitem-control
-saitem subsysytem control project
+saitem subsystem control project
