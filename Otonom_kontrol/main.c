@@ -2,35 +2,54 @@
 
 /**
  * main.c
- * Created on: 17 Tem 2020
- * LAST_AUTOR: Celil
+ * LAST_AUTOR:MERT
  */
 
 #include "main.h"
 
 
+
 int main(void)
- {
+{
     uart_init();
     control_gpio_init();
     pwm_init();
-    gpio_interrupt_init();
+    //gpio_interrupt_init();
     init_timerHardware();
-
+    steer_control(74);
     while(1){
 
-//if(start_flag){
-
-
-        buttonSpeedUp        = GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_SPEEDUP);
-        buttonRight          = GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_RIGHT);
+        //SysCtlDelay(SysCtlClockGet()/200);
+        buttonSpeedUp        = GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_SPEEDUP);
+        buttonRight          = GPIOPinRead(GPIO_PORTA_BASE, GPIO_PIN_RIGHT);
         buttonBrake          = GPIOPinRead(GPIO_PORTA_BASE, GPIO_PIN_BRAKE);
         buttonLeft           = GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_LEFT);
-        buttonSpeedDown      = GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_SPEEDDOWN);
+        buttonSpeedDown      = GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_SPEEDDOWN);
         button_on_off        = GPIOPinRead(GPIO_PORTA_BASE, GPIO_PIN_ONOFF);
 
+    if(!button_on_off){
+    ///****///
+        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 2);
+        if(start_flag){
+            /*CODES*/
+        }
+        start_flag = false;
 
-        PWMPulseWidthSet(PWM0_BASE, Speed_output, lastvalue_speed * ui32Load/1000);
+        }
+        else{
+
+        if(!start_flag){
+            /*CODES*/
+            GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0);
+        }
+        start_flag = true;
+        }
+
+
+if(start_flag){
+
+
+        //PWMPulseWidthSet(PWM0_BASE, Speed_output, lastvalue_speed * ui32Load/1000);
 
 ///////////////***********************/////////////////////////////
         /***LEFT***/
@@ -40,14 +59,14 @@ int main(void)
             GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 2);
             //if(stateButtonLeft){
                 /*CODES*/
-                steer_degree+=5;
-                if(steer_degree > 134)
+                steer_degree+=10;
+                if(steer_degree > 130)
                 {
-                    steer_degree = 134;
+                    steer_degree = 130;
                 }
                 steer_control(steer_degree);
 
-                SysCtlDelay(SysCtlClockGet()/100);
+               //SysCtlDelay(SysCtlClockGet()/300);
             //}
             stateButtonLeft = false;
 
@@ -70,14 +89,14 @@ int main(void)
             //if(stateButtonRight){
                 /*CODES*/
                 GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, 4);
-                steer_degree-=5;
-                if(steer_degree < 26)
+                steer_degree-=10;
+                if(steer_degree < 30)
                 {
-                    steer_degree = 26;
+                    steer_degree = 30;
                 }
                 steer_control(steer_degree);
 
-                SysCtlDelay(SysCtlClockGet()/100);
+                //SysCtlDelay(SysCtlClockGet()/300);
 
                 stateButtonRight = false;
 
@@ -117,8 +136,8 @@ int main(void)
                 SysCtlDelay(SysCtlClockGet()/100);
                 stateButtonBrake = true;
                 break_counter = 0;
-            //}
-        }
+            }
+
 //
 /////////////////***********************/////////////////////////////
         /***SPEED+***/
@@ -126,13 +145,13 @@ int main(void)
             ///****///
             if(stateButtonSpeedup){
                 /*CODES*/
-                speed+=50;
+                speed+=10;
                 GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2| GPIO_PIN_3, 12);
 
 
-                if(speed > 1000)
+                if(speed > 400)
                 {
-                    speed = 1;
+                    speed = 400;
                 }
                 speed_control(speed);
             }
@@ -154,7 +173,7 @@ int main(void)
             if(stateButtonSpeedDown){
                 /*CODES*/
                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1| GPIO_PIN_3, 10);
-               speed-=25;
+               speed-=10;
 
                if(speed < 1)
                {
@@ -174,7 +193,7 @@ int main(void)
             stateButtonSpeedDown = true;
         }
 
-//}
+}
     }
 }
 
@@ -218,47 +237,27 @@ void interrupt_uart(void){
 
     IntStatus = UARTIntStatus(UART0_BASE, true); //Hangi kesme oldugunu �grendik
     UARTIntClear(UART0_BASE, IntStatus); //Kesmeyi temizliyoruz bi daha gelen kesme icin
-
     rcv_ch = UARTCharGetNonBlocking(UART0_BASE); //veri al ama bloke etme. Eger o anda al�rsa normal degeri al�r.Alamaz ise -1 d�ner.
-    buffer[uart_counter++] = rcv_ch;
 
-    while(rcv_ch == '#'){
-
-         if(buffer[0] == '*'){
-            steer_degree = atoi((char *)buffer[1])*10 + atoi((char *)buffer[2]);
-            //steer_degree = (uint8_t)buffer[1];
-            if(buffer[3] == '+'){
-                if(buffer[4] == '1'){
-                    break_flag = true;
-                    uart_counter = 0;
-                }else{
-                    break_flag = false;
-                }
-            }
-            if (buffer[5] == '%')
-            {
-                speed = atoi((char *)buffer[6])*10 + atoi((char *)buffer[7]);
-            }
-        }else{
-            uart_counter = 0;
-        }
+    while(rcv_ch != '#'){
+        buffer[uart_counter] = rcv_ch;
+        uart_counter++;
+        rcv_ch = UARTCharGetNonBlocking(UART0_BASE);
     }
-
     uart_counter = 0;
 }
 void uart_parse(void){
-    if(buffer[0] == '*'){
-        steer_degree = atoi((char *)buffer[1])*10 + atoi((char *)buffer[2]);
-        steer_degree = (uint8_t)buffer[1];
-        if(buffer[3] == '+'){
+    if(buffer[0] == "*"){
+        steer_degree = atoi(buffer[1])*10 + atoi(buffer[2]);
+        if(buffer[3] == "+"){
             if(buffer[4] == '1')
                 break_flag = true;
             else
                 break_flag = false;
         }
-        if (buffer[5] == '%')
+        if (buffer[5] = '%')
         {
-            speed = atoi((char *)buffer[6])*10 + atoi((char *)buffer[7]);
+            speed = atoi(buffer[6])*10 + atoi(buffer[7]);
         }
     }
     else;
@@ -365,7 +364,6 @@ void steer_control(uint32_t ui8Adjust_0){
 }
 
 void speed_control(uint32_t rpm){
-
     if(lastvalue_speed < rpm)
     {
         for(lastvalue_speed;lastvalue_speed<rpm;lastvalue_speed++)
