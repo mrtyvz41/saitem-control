@@ -1,7 +1,7 @@
 /*
  * main.h
  *
- *  Created on: 9 Tem 2020
+ *  Created on: 17 Tem 2020
  *      Author:
  */
 #ifndef MAIN_H_
@@ -18,7 +18,6 @@
 #include "inc/hw_types.h"
 #include "inc/hw_gpio.h"
 
-#include "inc/tm4c123gh6pm.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/gpio.h"
 #include "driverlib/uart.h"
@@ -27,6 +26,41 @@
 #include "driverlib/pwm.h"
 #include "driverlib/debug.h"
 #include "driverlib/timer.h"
+
+#define PWM_FREQUENCY 55
+
+
+#define GPIO_PIN_LEFT           GPIO_PIN_7
+
+#define GPIO_PIN_RIGHT          GPIO_PIN_2
+
+#define GPIO_PIN_BRAKE          GPIO_PIN_3
+
+#define GPIO_PIN_SPEEDUP        GPIO_PIN_4  //GPIO_PIN_6
+
+#define GPIO_PIN_SPEEDDOWN      GPIO_PIN_0 //GPIO_PIN_3
+
+#define GPIO_PIN_ONOFF          GPIO_PIN_3
+
+//PWM CONFIGS //
+
+#define Speed_output            PWM_OUT_5
+
+#define Steer_output            PWM_OUT_4
+
+#define Brake_output            PWM_OUT_2
+
+#define Brake_PWM_PIN           GPIO_PIN_4
+
+#define Steer_PWM_PIN           GPIO_PIN_4
+
+#define Speed_PWM_PIN           GPIO_PIN_5
+
+#define Brake_PWM_Config        GPIO_PB4_M0PWM2
+
+#define Steer_PWM_Config        GPIO_PE4_M0PWM4
+
+#define Speed_PWM_Config        GPIO_PE5_M0PWM5
 
 
 bool buttonLeft = false;
@@ -62,47 +96,15 @@ bool speed_flag = false;
 
 bool tick = false; //timer variable
 
-bool start_flag = false;
+bool start_flag;
 
 // VARIABLE //
-#define PWM_FREQUENCY 55
 
+volatile uint32_t lastvalue_brake = 26; //
+volatile uint32_t lastvalue_steer = 26; //
+volatile uint32_t lastvalue_speed = 1;  //
 
-#define GPIO_PIN_LEFT           GPIO_PIN_7
-
-#define GPIO_PIN_RIGHT          GPIO_PIN_4
-
-#define GPIO_PIN_BRAKE          GPIO_PIN_3
-
-#define GPIO_PIN_SPEEDUP        GPIO_PIN_6
-
-#define GPIO_PIN_SPEEDDOWN      GPIO_PIN_3
-
-#define GPIO_PIN_ONOFF          GPIO_PIN_2
-
-//PWM CONFIGS //
-
-#define Speed_output            PWM_OUT_5
-
-#define Steer_output            PWM_OUT_4
-
-#define Brake_output            PWM_OUT_2
-
-#define Brake_PWM_PIN           GPIO_PIN_4
-
-#define Steer_PWM_PIN           GPIO_PIN_4
-
-#define Speed_PWM_PIN           GPIO_PIN_5
-
-#define Brake_PWM_Config        GPIO_PB4_M0PWM2
-
-#define Steer_PWM_Config        GPIO_PE4_M0PWM4
-
-#define Speed_PWM_Config        GPIO_PE5_M0PWM5
-
-
-
-uint32_t ui32Load;           // PWM  doluluk oranini(Duty cycle) belirlemek üzere kullanýlan degisken
+uint32_t ui32Load;           // PWM  doluluk oranini(Duty cycle) belirlemek ï¿½zere kullanï¿½lan degisken
 uint32_t ui32PWMClock;       // PWM osilatorunun clock degeri
 
 char buffer[100];
@@ -113,10 +115,6 @@ int  steer_degree = 74;
 
 int  speed = 1;
 char rcv_ch;  // uart flag
-
-uint32_t lastvalue_brake = 26; //
-uint32_t lastvalue_steer = 26; //
-uint32_t lastvalue_speed = 1;  //
 
 
 // METOD DEFINES //
