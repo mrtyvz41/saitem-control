@@ -16,7 +16,9 @@ int main(void)
     pwm_init();
     gpio_interrupt_init();
     init_timerHardware();
+    steer_control(74);
 
+    //speed_control(lastvalue_speed);
     while(1){
 
 //if(start_flag){
@@ -30,7 +32,7 @@ int main(void)
         button_on_off        = GPIOPinRead(GPIO_PORTA_BASE, GPIO_PIN_ONOFF);
 
 
-        PWMPulseWidthSet(PWM0_BASE, Speed_output, lastvalue_speed * ui32Load/1000);
+       PWMPulseWidthSet(PWM0_BASE, Speed_output, lastvalue_speed * ui32Load/1000);
 
 ///////////////***********************/////////////////////////////
         /***LEFT***/
@@ -47,7 +49,7 @@ int main(void)
                 }
                 steer_control(steer_degree);
 
-                SysCtlDelay(SysCtlClockGet()/100);
+                //SysCtlDelay(SysCtlClockGet()/100);
             //}
             stateButtonLeft = false;
 
@@ -77,7 +79,7 @@ int main(void)
                 }
                 steer_control(steer_degree);
 
-                SysCtlDelay(SysCtlClockGet()/100);
+                //SysCtlDelay(SysCtlClockGet()/100);
 
                 stateButtonRight = false;
 
@@ -101,6 +103,8 @@ int main(void)
               break_value = 32;
               brake_control(break_value);
               SysCtlDelay(SysCtlClockGet()/100);
+
+              PWMOutputState(PWM0_BASE, PWM_OUT_5_BIT, false);
               stateButtonBrake = false;
            }
               break_counter++;
@@ -115,6 +119,8 @@ int main(void)
                 break_value = 109;
                 brake_control(break_value);
                 SysCtlDelay(SysCtlClockGet()/100);
+
+                PWMOutputState(PWM0_BASE, PWM_OUT_5_BIT, true);
                 stateButtonBrake = true;
                 break_counter = 0;
             //}
@@ -128,7 +134,6 @@ int main(void)
                 /*CODES*/
                 speed+=50;
                 GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2| GPIO_PIN_3, 12);
-
 
                 if(speed > 1000)
                 {
@@ -144,6 +149,7 @@ int main(void)
             if(!stateButtonSpeedup){
                 /*CODES*/
                 GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2| GPIO_PIN_3, 0);
+
             }
             stateButtonSpeedup = true;
         }
@@ -154,6 +160,8 @@ int main(void)
             if(stateButtonSpeedDown){
                 /*CODES*/
                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1| GPIO_PIN_3, 10);
+
+
                speed-=25;
 
                if(speed < 1)
@@ -166,7 +174,6 @@ int main(void)
 
         }
         else{
-
             if(!stateButtonSpeedDown){
                 /*CODES*/
                 GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1| GPIO_PIN_3, 0);
@@ -208,7 +215,7 @@ void pwm_init(void){
 
     PWMOutputState(PWM0_BASE, PWM_OUT_2_BIT, true);
     PWMOutputState(PWM0_BASE, PWM_OUT_4_BIT, true);
-    PWMOutputState(PWM0_BASE, PWM_OUT_5_BIT, true);
+    PWMOutputState(PWM0_BASE, PWM_OUT_5_BIT, false);
     PWMGenEnable(PWM0_BASE, PWM_GEN_2);
     PWMGenEnable(PWM0_BASE, PWM_GEN_1);
 
@@ -324,6 +331,7 @@ void brake_control(uint32_t ui8Adjust_0)
            for(lastvalue_brake;lastvalue_brake<ui8Adjust_0;lastvalue_brake++)
            {
                PWMPulseWidthSet(PWM0_BASE, Brake_output, lastvalue_brake * ui32Load/1000);
+               PWMPulseWidthSet(PWM0_BASE, Speed_output, 0 * ui32Load/1000);
                SysCtlDelay(SysCtlClockGet()/1000);
            }
        }
@@ -332,6 +340,7 @@ void brake_control(uint32_t ui8Adjust_0)
            for(lastvalue_brake;lastvalue_brake>ui8Adjust_0;lastvalue_brake--)
            {
                PWMPulseWidthSet(PWM0_BASE, Brake_output, lastvalue_brake * ui32Load/1000);
+               PWMPulseWidthSet(PWM0_BASE, Speed_output, 0 * ui32Load/1000);
                SysCtlDelay(SysCtlClockGet()/1000);
            }
        }
