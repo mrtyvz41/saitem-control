@@ -42,6 +42,8 @@
 
 #define GPIO_PIN_ONOFF          GPIO_PIN_2
 
+#define GPIO_PIN_RELAY          GPIO_PIN_2 // RELAY OUTPUT
+
 //PWM CONFIGS //
 
 #define Speed_output            PWM_OUT_5
@@ -80,6 +82,7 @@ bool stateButtonSpeedDown = false;
 
 bool button_on_off = false;
 bool stateButton_on_off = false;
+bool relay_state = false;
 
 int counterr = 0;
 int elsecounter = 0;

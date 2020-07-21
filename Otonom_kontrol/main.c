@@ -10,15 +10,16 @@
 
 
 int main(void)
- {
+
+{
     uart_init();
     control_gpio_init();
     pwm_init();
     gpio_interrupt_init();
     init_timerHardware();
     steer_control(74);
-
-    //speed_control(lastvalue_speed);
+    //speed_control(1);
+    //GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_RELAY, GPIO_PIN_RELAY);
     while(1){
 
 //if(start_flag){
@@ -32,7 +33,7 @@ int main(void)
         button_on_off        = GPIOPinRead(GPIO_PORTA_BASE, GPIO_PIN_ONOFF);
 
 
-       PWMPulseWidthSet(PWM0_BASE, Speed_output, lastvalue_speed * ui32Load/1000);
+      // PWMPulseWidthSet(PWM0_BASE, Speed_output, lastvalue_speed * ui32Load/1000);
 
 ///////////////***********************/////////////////////////////
         /***LEFT***/
@@ -103,8 +104,6 @@ int main(void)
               break_value = 32;
               brake_control(break_value);
               SysCtlDelay(SysCtlClockGet()/100);
-
-              PWMOutputState(PWM0_BASE, PWM_OUT_5_BIT, false);
               stateButtonBrake = false;
            }
               break_counter++;
@@ -120,7 +119,7 @@ int main(void)
                 brake_control(break_value);
                 SysCtlDelay(SysCtlClockGet()/100);
 
-                PWMOutputState(PWM0_BASE, PWM_OUT_5_BIT, true);
+                //PWMOutputState(PWM0_BASE, PWM_OUT_5_BIT, true);
                 stateButtonBrake = true;
                 break_counter = 0;
             //}
@@ -132,6 +131,7 @@ int main(void)
             ///****///
             if(stateButtonSpeedup){
                 /*CODES*/
+
                 speed+=50;
                 GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2| GPIO_PIN_3, 12);
 
@@ -156,9 +156,10 @@ int main(void)
 /////////////////***********************/////////////////////////////
         /***SPEED-***/
         if(!buttonSpeedDown){
-            ///****///
+            /****///
             if(stateButtonSpeedDown){
                 /*CODES*/
+
                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1| GPIO_PIN_3, 10);
 
 
@@ -177,11 +178,12 @@ int main(void)
             if(!stateButtonSpeedDown){
                 /*CODES*/
                 GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1| GPIO_PIN_3, 0);
+
             }
             stateButtonSpeedDown = true;
         }
 
-//}
+
     }
 }
 
@@ -204,18 +206,20 @@ void pwm_init(void){
 
     ui32PWMClock = SysCtlClockGet()/64;
     ui32Load = (ui32PWMClock / PWM_FREQUENCY) - 1;
-    PWMGenConfigure(PWM0_BASE, PWM_GEN_2, PWM_GEN_MODE_DOWN);
+
+    PWMGenConfigure(PWM0_BASE, PWM_GEN_2, PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
     PWMGenPeriodSet(PWM0_BASE, PWM_GEN_2, ui32Load);
     PWMGenConfigure(PWM0_BASE, PWM_GEN_1, PWM_GEN_MODE_DOWN);
     PWMGenPeriodSet(PWM0_BASE, PWM_GEN_1, ui32Load);
 
     PWMPulseWidthSet(PWM0_BASE, Brake_output, 1);
     PWMPulseWidthSet(PWM0_BASE, Steer_output, 1);
-    PWMPulseWidthSet(PWM0_BASE, Brake_output, 1);
+    PWMPulseWidthSet(PWM0_BASE, Speed_output, 1);
 
     PWMOutputState(PWM0_BASE, PWM_OUT_2_BIT, true);
     PWMOutputState(PWM0_BASE, PWM_OUT_4_BIT, true);
-    PWMOutputState(PWM0_BASE, PWM_OUT_5_BIT, false);
+    PWMOutputState(PWM0_BASE, PWM_OUT_5_BIT, true);
+
     PWMGenEnable(PWM0_BASE, PWM_GEN_2);
     PWMGenEnable(PWM0_BASE, PWM_GEN_1);
 
@@ -310,15 +314,16 @@ void control_gpio_init(){
 
     GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);
     GPIOPinTypeGPIOOutput(GPIO_PORTC_BASE, GPIO_PIN_6);
+    GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE, GPIO_PIN_2);
 
 
     GPIOPinTypeGPIOInput(GPIO_PORTF_BASE, GPIO_PIN_0|GPIO_PIN_4);
     GPIOPinTypeGPIOInput(GPIO_PORTA_BASE, GPIO_PIN_2|GPIO_PIN_3|GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6);
-    GPIOPinTypeGPIOInput(GPIO_PORTB_BASE, GPIO_PIN_5|GPIO_PIN_1|GPIO_PIN_3|GPIO_PIN_0|GPIO_PIN_4|GPIO_PIN_2|GPIO_PIN_6|GPIO_PIN_7);
+    GPIOPinTypeGPIOInput(GPIO_PORTB_BASE, GPIO_PIN_5|GPIO_PIN_1|GPIO_PIN_3|GPIO_PIN_0|GPIO_PIN_4|GPIO_PIN_6|GPIO_PIN_7);
 
 
     GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_0|GPIO_PIN_4, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPU); //pull-up pin 4
-    GPIOPadConfigSet(GPIO_PORTB_BASE, GPIO_PIN_5|GPIO_PIN_1|GPIO_PIN_3|GPIO_PIN_0|GPIO_PIN_4|GPIO_PIN_2, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPU); //pull-up pin 4
+    GPIOPadConfigSet(GPIO_PORTB_BASE, GPIO_PIN_5|GPIO_PIN_1|GPIO_PIN_3|GPIO_PIN_0|GPIO_PIN_4, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPU); //pull-up pin 4
     GPIOPadConfigSet(GPIO_PORTA_BASE, GPIO_PIN_2|GPIO_PIN_3|GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPU); //pull-up pin 4
 
 }
