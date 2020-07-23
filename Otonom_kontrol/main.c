@@ -10,15 +10,13 @@
 
 
 int main(void)
-
 {
-    uart_init();
+    //uart_init();
     control_gpio_init();
     pwm_init();
     gpio_interrupt_init();
     init_timerHardware();
     steer_control(74);
-    //speed_control(1);
     //GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_RELAY, GPIO_PIN_RELAY);
     while(1){
 
@@ -33,7 +31,6 @@ int main(void)
         button_on_off        = GPIOPinRead(GPIO_PORTA_BASE, GPIO_PIN_ONOFF);
 
 
-      // PWMPulseWidthSet(PWM0_BASE, Speed_output, lastvalue_speed * ui32Load/1000);
 
 ///////////////***********************/////////////////////////////
         /***LEFT***/
@@ -104,6 +101,7 @@ int main(void)
               break_value = 32;
               brake_control(break_value);
               SysCtlDelay(SysCtlClockGet()/100);
+              speed = 1;
               stateButtonBrake = false;
            }
               break_counter++;
@@ -163,7 +161,7 @@ int main(void)
                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1| GPIO_PIN_3, 10);
 
 
-               speed-=25;
+               speed-=100;
 
                if(speed < 1)
                {
@@ -172,7 +170,6 @@ int main(void)
                speed_control(speed);
             }
             stateButtonSpeedDown = false;
-
         }
         else{
             if(!stateButtonSpeedDown){
@@ -281,29 +278,63 @@ void uart_init(void){
     SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0); //UART aktif hale getiriliyor
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA); // UART GPIO �zerinden �alistigi icin
 
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART3); //UART aktif hale getiriliyor
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC); // UART GPIO �zerinden �alistigi icin
+///************************///
     // Mikroislemcilerde gp�o'lar fakli amaclar icin kullanilabilir burada uart olarak kullanacagimizi belirtiyoruz.
     GPIOPinConfigure(GPIO_PA0_U0RX);
     GPIOPinConfigure(GPIO_PA1_U0TX);
     GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
 
+    GPIOPinConfigure(GPIO_PC6_U3RX);
+    GPIOPinConfigure(GPIO_PC7_U3TX);
+    GPIOPinTypeUART(GPIO_PORTC_BASE, GPIO_PIN_7 | GPIO_PIN_6);
+///**************************///
     // UART kesmesi deaktif edildi.
     IntDisable(INT_UART0); // UART kesmesi deaktif edildi.
     UARTDisable(UART0_BASE);
+
+    IntDisable(INT_UART3); // UART kesmesi deaktif edildi.
+    UARTDisable(UART3_BASE);
+///**************************///
 
     //Uart'�n �nerilen pi oslat�r� ile calismasi saglan�yor.
     UARTClockSourceSet(UART0_BASE, UART_CLOCK_PIOSC);
     UARTConfigSetExpClk(UART0_BASE, SysCtlClockGet(), 115200, UART_CONFIG_WLEN_8|UART_CONFIG_STOP_ONE|UART_CONFIG_PAR_NONE); //uart ayarlar� yap�l�yor; 8 bitlik haberle�me,1bitlik durma, parity yok.
     UARTFIFODisable(UART0_BASE);
+
+    UARTClockSourceSet(UART3_BASE, UART_CLOCK_PIOSC);
+    UARTConfigSetExpClk(UART3_BASE, SysCtlClockGet(), 115200, UART_CONFIG_WLEN_8|UART_CONFIG_STOP_ONE|UART_CONFIG_PAR_NONE); //uart ayarlar� yap�l�yor; 8 bitlik haberle�me,1bitlik durma, parity yok.
+    UARTFIFODisable(UART3_BASE);
+///**************************////
     //UART kesmesi bir veri geldiginde veya okuma s�resi doldugunda aktif edilir.
     UARTIntEnable(UART0_BASE, UART_INT_RX|UART_INT_RT);
+    UARTIntEnable(UART3_BASE, UART_INT_RX|UART_INT_RT);
     //UART kesmesi geldiginde hngi fonksiyona dallanmasi soylenir
     UARTIntRegister(UART0_BASE, interrupt_uart);
+    UARTIntRegister(UART3_BASE, xbee_uart_int);
 
     //UART aktif edilir.
     UARTEnable(UART0_BASE);
+    UARTEnable(UART3_BASE);
 
     //Kesme uarttan gelen veriye g�re aktif edilir.
     IntEnable(INT_UART0);
+    IntEnable(INT_UART3);
+}
+void xbee_uart_int(){
+    char rcv_ch;
+    uint32_t IntStatus;
+
+    IntStatus = UARTIntStatus(UART3_BASE, true);
+    UARTIntClear(UART3_BASE, IntStatus);
+
+    rcv_ch = UARTCharGetNonBlocking(UART3_BASE);
+
+    if((uint32_t)rcv_ch!=-1){
+        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1| GPIO_PIN_3, 10);
+    }
+
 }
 
 void control_gpio_init(){

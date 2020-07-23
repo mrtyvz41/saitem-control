@@ -116,7 +116,7 @@ int  brake_counter;
 int  steer_degree = 74;
 
 
-int  speed = 1;
+int  speed = 300;
 char rcv_ch;  // uart flag
 
 
@@ -133,7 +133,7 @@ void gpio_interrupt_init(void);
 void IntGPIOdHandler(void);
 void init_timerHardware (void);
 void IntTimer1 (void);
-
+void xbee_uart_int(void);
 
 #endif /* MAIN_H_ */
 
