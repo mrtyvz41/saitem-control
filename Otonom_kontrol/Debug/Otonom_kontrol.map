@@ -1,7 +1,7 @@
 ******************************************************************************
                   TI ARM Linker PC v20.2.1                     
 ******************************************************************************
->> Linked Tue Jul 21 23:24:27 2020
+>> Linked Tue Jul 28 01:43:11 2020
 
 OUTPUT FILE NAME:   <Otonom_kontrol.out>
 ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 00001581
