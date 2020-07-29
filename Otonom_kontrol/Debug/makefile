@@ -11,8 +11,8 @@ GEN_CMDS__FLAG :=
 
 ORDERED_OBJS += \
 "./main.obj" \
-"./tm4c123gh6pm_startup_ccs.obj" \
-"../tm4c123gh6pm.cmd" \
+"./tm4c123ge6pm_startup_ccs.obj" \
+"../tm4c123ge6pm.cmd" \
 $(GEN_CMDS__FLAG) \
 -llibc.a \
 -l"C:/ti/TivaWare_C_Series-2.2.0.295/driverlib/ccs/Debug/driverlib.lib" \
@@ -122,42 +122,42 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXE_OUTPUTS += \
-Otonom_kontrol.out \
+saitem_control.out \
 
 EXE_OUTPUTS__QUOTED += \
-"Otonom_kontrol.out" \
+"saitem_control.out" \
 
 BIN_OUTPUTS += \
-Otonom_kontrol.hex \
+saitem_control.hex \
 
 BIN_OUTPUTS__QUOTED += \
-"Otonom_kontrol.hex" \
+"saitem_control.hex" \
 
 
 # All Target
 all: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
-	@$(MAKE) --no-print-directory -Onone "Otonom_kontrol.out"
+	@$(MAKE) --no-print-directory -Onone "saitem_control.out"
 
 # Tool invocations
-Otonom_kontrol.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+saitem_control.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: ARM Linker'
-	"C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --c99 --c++14 --relaxed_ansi --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"Otonom_kontrol.map" --heap_size=0 --stack_size=512 -i"C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/lib" -i"C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="Otonom_kontrol_linkInfo.xml" --rom_model -o "Otonom_kontrol.out" $(ORDERED_OBJS)
+	"C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=PART_TM4C123GE6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"saitem_control.map" --heap_size=0 --stack_size=512 -i"C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/lib" -i"C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="saitem_control_linkInfo.xml" --rom_model -o "saitem_control.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 
-Otonom_kontrol.hex: $(EXE_OUTPUTS)
+saitem_control.hex: $(EXE_OUTPUTS)
 	@echo 'Building files: $(strip $(EXE_OUTPUTS__QUOTED))'
 	@echo 'Invoking: ARM Hex Utility'
-	"C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/bin/armhex"  -o "Otonom_kontrol.hex" $(EXE_OUTPUTS__QUOTED)
+	"C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/bin/armhex"  -o "saitem_control.hex" $(EXE_OUTPUTS__QUOTED)
 	@echo 'Finished building: $(strip $(EXE_OUTPUTS__QUOTED))'
 	@echo ' '
 
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "main.obj" "tm4c123gh6pm_startup_ccs.obj" 
-	-$(RM) "main.d" "tm4c123gh6pm_startup_ccs.d" 
+	-$(RM) "main.obj" "tm4c123ge6pm_startup_ccs.obj" 
+	-$(RM) "main.d" "tm4c123ge6pm_startup_ccs.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 
