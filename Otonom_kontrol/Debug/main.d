@@ -1,6 +1,7 @@
 # FIXED
 
 main.obj: ../main.c
+main.obj: ../main.h
 main.obj: C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/stdio.h
 main.obj: C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/_ti_config.h
 main.obj: C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/linkage.h
@@ -16,7 +17,6 @@ main.obj: C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/sys/_st
 main.obj: C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/stdbool.h
 main.obj: C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/stdlib.h
 main.obj: C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/string.h
-main.obj: ../main.h
 main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/inc/hw_memmap.h
 main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/inc/hw_ints.h
 main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/inc/hw_types.h
@@ -31,6 +31,7 @@ main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/driverlib/debug.h
 main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/driverlib/timer.h
 
 ../main.c: 
+../main.h: 
 C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/stdio.h: 
 C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/_ti_config.h: 
 C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/linkage.h: 
@@ -46,7 +47,6 @@ C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/sys/_stdint.h:
 C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/stdbool.h: 
 C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/stdlib.h: 
 C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-arm_20.2.1.LTS/include/string.h: 
-../main.h: 
 C:/ti/TivaWare_C_Series-2.2.0.295/inc/hw_memmap.h: 
 C:/ti/TivaWare_C_Series-2.2.0.295/inc/hw_ints.h: 
 C:/ti/TivaWare_C_Series-2.2.0.295/inc/hw_types.h: 
