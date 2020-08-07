@@ -25,8 +25,22 @@
 #define BASE_STEER_RIGHT            GPIO_PORTA_BASE
 #define PIN_STEER_RIGHT             GPIO_PIN_4
 
+#define PERIPH_ON_OFF               SYSCTL_PERIPH_GPIOA
+#define BASE_ON_OFF                 GPIO_PORTA_BASE
+#define PIN_ON_OFF                  GPIO_PIN_3
+
+#define PERIPH_RELAY               SYSCTL_PERIPH_GPIOC
+#define BASE_RELAY                 GPIO_PORTC_BASE
+#define PIN_RELAY                  GPIO_PIN_4
+
+#define PERIPH_RELAY_SINYAL        SYSCTL_PERIPH_GPIOB
+#define BASE_RELAY_SINYAL          GPIO_PORTB_BASE
+#define PIN_RELAY_SINYAL           GPIO_PIN_2
+
 char xbee_buffer[200];
 int uart_counter = 0;
+bool autonom_state = false;
+bool relay_state = false;
 void IntXbee(void);
 /****/
 void speed_up(void);

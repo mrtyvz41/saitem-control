@@ -68,7 +68,7 @@ void IntTimer1 ( void ){
 
 void initHandle ( void ){
 
-
+//** button config **//
     SysCtlPeripheralEnable(PERIPH_SPEED_NEG);
     GPIOPinTypeGPIOInput(BASE_SPEED_NEG, PIN_SPEED_NEG);
     GPIOPadConfigSet(BASE_SPEED_NEG, PIN_SPEED_NEG, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPU);
@@ -89,6 +89,19 @@ void initHandle ( void ){
     GPIOPinTypeGPIOInput(BASE_STEER_RIGHT, PIN_STEER_RIGHT);
     GPIOPadConfigSet(BASE_STEER_RIGHT, PIN_STEER_RIGHT, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPU);
 
+    SysCtlPeripheralEnable(PERIPH_ON_OFF);
+    GPIOPinTypeGPIOInput(BASE_ON_OFF, PIN_ON_OFF);
+    GPIOPadConfigSet(BASE_ON_OFF, PIN_ON_OFF, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPD);
+
+    SysCtlPeripheralEnable(PERIPH_RELAY);
+    GPIOPinTypeGPIOInput(BASE_RELAY, PIN_RELAY);
+    GPIOPadConfigSet(BASE_RELAY, PIN_RELAY, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPD);
+
+    SysCtlPeripheralEnable(PERIPH_RELAY_SINYAL);
+    GPIOPinTypeGPIOOutput(BASE_RELAY_SINYAL, PIN_RELAY_SINYAL);
+    GPIOPadConfigSet(BASE_RELAY_SINYAL, PIN_RELAY_SINYAL, GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD);
+
+//** button config end **//
 
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
@@ -147,7 +160,7 @@ void initHandle ( void ){
     UARTIntEnable( UART3_BASE, UART_INT_RX | UART_INT_RT );
 
     UARTIntRegister( UART3_BASE, IntXbee );
-    UARTEnable( UART3_BASE);
+    UARTEnable( UART3_BASE );
 
 
 
@@ -159,6 +172,7 @@ void initHandle ( void ){
 
 }
 void IntXbee(void){
+
     char rcv_data;
     uint32_t xbee_status;
     xbee_status = UARTIntStatus(UART3_BASE, true);
@@ -201,7 +215,7 @@ void IntXbee(void){
 
 }
 void brake(void){
-    speed = 0;
+   speed = 0;
    PWMOutputState(PWM0_BASE, PWM_OUT_2_BIT , false);
 
    PWMOutputState(PWM0_BASE, PWM_OUT_5_BIT , true);
@@ -236,6 +250,19 @@ void speed_down(void){
 
 }
 void ButtonState ( void ){
+
+    if(GPIOPinRead(BASE_RELAY, PIN_RELAY)){
+        relay_state = true;
+    }
+    else{
+        relay_state = false;
+    }
+    if(GPIOPinRead(BASE_ON_OFF, PIN_ON_OFF)){
+        autonom_state = true;
+    }
+    else{
+        autonom_state = false;
+    }
 
     if(isSpeedUpBtn.value != GPIOPinRead(BASE_SPEED_POS, PIN_SPEED_POS)){
 
@@ -377,9 +404,15 @@ int main(void)
 
 	    ButtonState();
 
+
         if(tick){
             tick = false;
-
+            if(relay_state){
+                GPIOPinWrite(BASE_RELAY_SINYAL, PIN_RELAY_SINYAL, PIN_RELAY_SINYAL);
+            }
+            else{
+                GPIOPinWrite(BASE_RELAY_SINYAL, PIN_RELAY_SINYAL, 0);
+            }
             if( isSpeedUpTimer.set != 0 ){
                 if( ++isSpeedUpTimer.count >= isSpeedUpTimer.set ){
                     isSpeedUpTimer.count = 0;
@@ -448,4 +481,5 @@ int main(void)
         }
 
 	}
+
 }
