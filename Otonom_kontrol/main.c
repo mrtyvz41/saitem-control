@@ -169,6 +169,86 @@ void initHandle ( void ){
     IntEnable( INT_UART3);
     //*** END **//
 
+    /**** UART 1 CONFIG ******/
+    SysCtlPeripheralEnable( SYSCTL_PERIPH_UART1);
+    SysCtlPeripheralEnable( SYSCTL_PERIPH_GPIOB);
+
+    GPIOPinConfigure( GPIO_PB1_U1TX);
+    GPIOPinConfigure( GPIO_PB0_U1RX);
+    GPIOPinTypeUART( GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+
+    IntDisable(INT_UART1);
+    UARTDisable( UART1_BASE);
+    UARTClockSourceSet( UART1_BASE, UART_CLOCK_PIOSC );
+
+    UARTConfigSetExpClk( UART1_BASE, 16000000, 9600 , UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE );
+    UARTIntEnable( UART1_BASE, UART_INT_RX | UART_INT_RT );
+
+    UARTIntRegister( UART1_BASE, mainUart );
+    UARTEnable( UART1_BASE );
+
+
+
+
+
+    IntEnable( INT_UART1);
+    //*** END **//
+
+}
+void mainUart(void){
+
+
+    char rcv_data;
+    uint32_t main_status;
+    main_status = UARTIntStatus(UART1_BASE, true);
+
+    UARTIntClear(UART1_BASE, main_status);
+    rcv_data = UARTCharGetNonBlocking(UART1_BASE);
+
+    if((uint32_t)rcv_data != (-1)){
+
+        main_buffer[uart_counter_m++] = rcv_data;
+
+        if(autonom_state){
+
+        if(main_buffer[0] == '#'){
+            if(main_buffer[1] == '+'){
+                steer_degree = atoi(&main_buffer[2]);
+                SteerPos = 74 + steer_degree*4;
+                turn_left();
+            }
+            if(main_buffer[1] == '-'){
+                steer_degree = atoi(&main_buffer[2]);
+                SteerPos = 74 - steer_degree*4;
+               turn_right();
+            }
+            if(main_buffer[1] == 'h'){
+                    if(main_buffer[2] == '1'){
+                        speed = 40;
+                        speed_up();
+                    }
+
+            }
+            if(main_buffer[1] == 'f'){
+                if(main_buffer[2] == '1'){
+                    brake();
+                }
+
+            }
+
+        }
+        if(main_buffer[3] == '$' || main_buffer[4] == '$' || uart_counter_m > 5){
+            uart_counter_m = 0;
+            memset(main_buffer, 0, sizeof(main_buffer));
+        }
+
+        }
+        else{
+            uart_counter_m = 0;
+        }
+    }
+
+
 
 }
 void IntXbee(void){
@@ -191,19 +271,13 @@ void IntXbee(void){
                 uart_counter = 0;
                 memset(xbee_buffer, 0, sizeof(xbee_buffer));
             }
-            if(xbee_buffer[1] == 'i'){
-                 speed_up();
-            }
-            if(xbee_buffer[1] == 'g'){
-                speed_down();
-            }
-            if(xbee_buffer[1] == 'a'){
-                turn_left();
-            }
-            if(xbee_buffer[1] == 's'){
-                turn_right();
-            }
+            if(xbee_buffer[1] == 'i') speed_up();
+            if(xbee_buffer[1] == 'g') speed_down();
+            if(xbee_buffer[1] == 'a') turn_left();
+            if(xbee_buffer[1] == 's') turn_right();
             if(xbee_buffer[1] == 'f') brake();
+            if(xbee_buffer[1] == 'r') relay_on();
+            if(xbee_buffer[1] == 'k') relay_off();
         }
         else{
             uart_counter = 0;
@@ -228,12 +302,23 @@ void brake(void){
    PWMOutputState(PWM0_BASE, PWM_OUT_5_BIT , false);
 }
 void turn_right(void){
-    PWMPulseWidthSet(PWM0_BASE, PWM_OUT_4, ((SteerPos-=16) * ui32Load/1000) );
+    if(SteerPos < 28 || SteerPos > 5000){
+        SteerPos = 28;
+        steer_degree = -12;
+    }
+    PWMPulseWidthSet(PWM0_BASE, PWM_OUT_4, ((SteerPos) * ui32Load/1000) );
     PWMOutputState(PWM0_BASE, PWM_OUT_4_BIT , true);
+
 }
 void turn_left(void){
-    PWMPulseWidthSet(PWM0_BASE, PWM_OUT_4, ((SteerPos+=16) * ui32Load/1000) );
+    // her 4 degeri 1 derece döndürüyor.
+    if(SteerPos > 120 || SteerPos > 5000){
+        SteerPos = 120;
+        steer_degree = 12;
+    }
+    PWMPulseWidthSet(PWM0_BASE, PWM_OUT_4, ((SteerPos) * ui32Load/1000) );
     PWMOutputState(PWM0_BASE, PWM_OUT_4_BIT , true);
+
 }
 void speed_up(void){
     PWMOutputState(PWM0_BASE, PWM_OUT_2_BIT , true);
@@ -249,6 +334,12 @@ void speed_down(void){
     PWMPulseWidthSet(PWM0_BASE, PWM_OUT_2, speed );
 
 }
+void relay_on(void){
+    relay_state_u = true;
+}
+void relay_off(void){
+    relay_state_u = false;
+}
 void ButtonState ( void ){
 
     if(!GPIOPinRead(BASE_RELAY, PIN_RELAY)){
@@ -257,7 +348,12 @@ void ButtonState ( void ){
         else{
             relay_state = false;
         }
-
+    if(!GPIOPinRead(BASE_ON_OFF, PIN_ON_OFF)){
+            autonom_state = true;
+        }
+        else{
+            autonom_state = false;
+        }
 
     if(isSpeedUpBtn.value != GPIOPinRead(BASE_SPEED_POS, PIN_SPEED_POS)){
 
@@ -399,7 +495,7 @@ int main(void)
 	while(1){
 
 	    ButtonState();
-	    if(relay_state){
+	    if(relay_state || relay_state_u){
             GPIOPinWrite(BASE_RELAY_SINYAL, PIN_RELAY_SINYAL, PIN_RELAY_SINYAL);
         }
         else{
@@ -451,7 +547,8 @@ int main(void)
 
                     if( isLeftSteerTimer.state ){
 
-                        if( SteerPos < 134 ){
+                        if( SteerPos < 120 ){
+                            SteerPos += 4;
                             turn_left();
                         }else{
                             isRightSteerTimer.set = 0;
@@ -466,7 +563,8 @@ int main(void)
                     isRightSteerTimer.state = !isRightSteerTimer.state;
 
                     if( isRightSteerTimer.state ){
-                        if( SteerPos > 26 ){
+                        if( SteerPos > 28 ){
+                            SteerPos -= 4;
                             turn_right();
                         }else{
                             isLeftSteerTimer.set = 0;

@@ -38,17 +38,23 @@
 #define PIN_RELAY_SINYAL           GPIO_PIN_2
 
 char xbee_buffer[200];
+char main_buffer[200];
 int uart_counter = 0;
+int uart_counter_m = 0;
 bool autonom_state = false;
 bool relay_state = false;
+bool relay_state_u = false;
+int steer_degree = 0;
 void IntXbee(void);
+void mainUart(void);
 /****/
 void speed_up(void);
 void speed_down(void);
 void turn_left(void);
 void turn_right(void);
 void brake(void);
-
+void relay_on(void);
+void relay_off(void);
     //
     //                PWMPulseWidthSet(PWM0_BASE, PWM_OUT_2, 200);
     //                PWMOutputState(PWM0_BASE, PWM_OUT_2_BIT , true);
