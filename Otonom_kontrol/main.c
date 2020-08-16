@@ -223,15 +223,18 @@ void mainUart(void){
                turn_right();
             }
             if(main_buffer[1] == 'h'){
-                    if(main_buffer[2] == '1'){
-                        speed = 40;
-                        speed_up();
-                    }
-
+//                    if(main_buffer[2] == '1'){
+//                        speed = 60;
+//                        speed_up();
+//                    }
             }
             if(main_buffer[1] == 'f'){
                 if(main_buffer[2] == '1'){
                     brake();
+                }
+                else if(main_buffer[2] == '0'){
+                    speed = 68;
+                    speed_up();
                 }
 
             }
